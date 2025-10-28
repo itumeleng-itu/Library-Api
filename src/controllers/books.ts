@@ -1,9 +1,8 @@
 import {Request, Response, NextFunction} from "express"
-import { HttpError } from "../middleware/logger";
 
 
 // array of books
-let books=[
+export let books=[
     {
       id: 1,
       title: "Things Fall Apart",
@@ -35,7 +34,7 @@ let books=[
     const book = books.find((book) => book.id === parseInt(id as string));
 
     if(!book){
-        return next(new HttpError(404, "Book not found"));
+        return next({ status: 404, message: "Book not found" });
     }
     res.status(200).json(book)
   }
@@ -46,7 +45,7 @@ let books=[
     const book = books.find((book) => book.title === title);
 
     if(!book){
-        return next(new HttpError(404, "Book not found"));
+        return next({ status: 404, message: "Book not found" });
     }
     res.status(200).json(book)
   }
@@ -58,7 +57,7 @@ let books=[
     const book = books.find((book) => book.year === parseInt(year as string));
 
     if(!book){
-        return next(new HttpError(404, "Book not found"));
+        return next({ status: 404, message: "Book not found" });
     }
     res.status(200).json(book)
   }
@@ -69,7 +68,7 @@ let books=[
     const book = books.find((book) => book.author === author);
 
     if(!book){
-        return next(new HttpError(404, "Book not found"));
+        return next({ status: 404, message: "Book not found" });
     }
     res.status(200).json(book)
   }
@@ -81,12 +80,12 @@ let books=[
     const book = books.find((book) => book.id === parseInt(id as string));
 
     if(!book){
-        return next(new HttpError(404, "Book not found"));
+        return next({ status: 404, message: "Book not found" });
     }
     const{title, author,year} = req.body;
 
     if(!title || !author || !year){
-        return next(new HttpError(400, "Missing required fields", ["title","author","year"]));
+        return next({ status: 400, message: "Missing required fields", details: ["title","author","year"] });
     }
     book.author = author;
     book.title = title;
@@ -100,11 +99,11 @@ let books=[
     const{title, author,year} = req.body;
 
     if(!title || !author || !year){
-        return next(new HttpError(400, "Missing required fields", ["title","author","year"]));
+        return next({ status: 400, message: "Missing required fields", details: ["title","author","year"] });
     }
     const exists = books.some((b)=> b.title === title && b.author === author);
     if (exists) {
-      return next(new HttpError(409, "Book already exists"));
+      return next({ status: 409, message: "Book already exists" });
     }
     const newBook = {id:books.length+1, title,author, year: parseInt(year as string)}
 
@@ -119,7 +118,7 @@ let books=[
     const book = books.find((book) => book.id === parseInt(id as string));
 
     if(!book){
-        return next(new HttpError(404, "Book not found"));
+        return next({ status: 404, message: "Book not found" });
     }
     const bookIndex = books.indexOf(book);
     books.splice(bookIndex, 1);

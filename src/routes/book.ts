@@ -1,4 +1,4 @@
-import {Router, Request, Response} from "express";
+import {Router, Request, Response, NextFunction} from "express";
 import {body, param , validationResult} from "express-validator"
 import { getAllBooks,getBookById, addBook,   deleteBook, editBook, getBookByAuthor, getBookByYear,  getBookByTitle } from "../controllers/books";
 
@@ -10,25 +10,25 @@ const router = Router()
 router.get("/",getAllBooks);
 
 //get book by id
-router.get("/:id", [param("id").isInt().withMessage("id must be an integer")],(req: Request, res:Response)=>{
+router.get("/id/:id", [param("id").isInt().withMessage("id must be an integer")],(req: Request, res:Response, next: NextFunction)=>{
     const errors = validationResult(req)
 
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()});
     }
 
-    getBookById(req, res)
+    getBookById(req, res, next)
 });
 
 //delete a book
-router.delete("/:id", [param("id").isInt().withMessage("id must be an integer")],(req: Request, res:Response)=>{
+router.delete("/id/:id", [param("id").isInt().withMessage("id must be an integer")],(req: Request, res:Response, next: NextFunction)=>{
     const errors = validationResult(req)
 
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()});
     }
 
-    deleteBook(req, res)
+    deleteBook(req, res, next)
 });
 
 //add a book
@@ -36,51 +36,51 @@ router.post("/",[
     body("title").notEmpty().withMessage("Title is required"), 
     body("author").notEmpty().withMessage("Author name is required"),
     body("year").isInt().withMessage("Year must be an integer")
-], (req: Request, res:Response)=>{
+], (req: Request, res:Response, next: NextFunction)=>{
     const errors = validationResult(req)
 
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()});
     }
-    addBook(req,res)
+    addBook(req,res, next)
 })
 
 //edit a book
-router.patch( "/:id", [param("id").isInt().withMessage("ID must be an integer"),body("title").notEmpty().withMessage("Title is required"),
+router.patch( "/id/:id", [param("id").isInt().withMessage("ID must be an integer"),body("title").notEmpty().withMessage("Title is required"),
       body("author").notEmpty().withMessage("Author name is required"),
       body("year").isInt().withMessage("Year must be a number"),
     ],
-    (req: Request, res: Response) => {
+    (req: Request, res: Response, next: NextFunction) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      editBook(req, res);
+      editBook(req, res, next);
     }
   );
 
 
   // get book by title
-  router.get("/:title", (req: Request, res: Response) => {
+  router.get("/title/:title", (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    getBookByTitle(req, res);
+    getBookByTitle(req, res, next);
   });
 
   //get book by author
-  router.get("/:author", (req: Request, res: Response) => {
-    getBookByAuthor(req, res);
+  router.get("/author/:author", (req: Request, res: Response, next: NextFunction) => {
+    getBookByAuthor(req, res, next);
   });
   
   //Get book by year
-  router.get("/:year", [param("year").isInt().withMessage("Year must be an integer")], (req: Request, res: Response) => {
+  router.get("/year/:year", [param("year").isInt().withMessage("Year must be an integer")], (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    getBookByYear(req, res);
+    getBookByYear(req, res, next);
   });
 
 export default router
